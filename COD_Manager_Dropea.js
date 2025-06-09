@@ -27,14 +27,8 @@ function actualizarPedidosDesdeDropea() {
     
     const cambios = [];
     
-    // Mapeo de columnas (igual que tu función original)
-    const colOrders = {
-      id: 4,        // E - ID del pedido (Shopify)
-      nombre: 5,    // F - Nombre del cliente
-      telefono: 6,  // G - Teléfono
-      estado: 15,   // P - Estado del pedido
-      fecha: 3      // D - Fecha del pedido
-    };
+    // Mapeo de columnas tomado de la configuración central
+    const colOrders = obtenerColumnasOrders();
     
     // Procesar cada pedido de Dropea
     for (let pedidoDropea of pedidosDropea) {

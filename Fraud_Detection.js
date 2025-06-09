@@ -9,6 +9,7 @@
 
 function analizarNuevosPedidos() {
   try {
+    const configFraude = obtenerConfigFraude();
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const hojaOrders = ss.getSheetByName('ORDERS');
     
@@ -33,14 +34,9 @@ function analizarNuevosPedidos() {
         if (resultado.puntuacion >= 6) {
           sospechosos++;
         }
-        
-        // Pausa pequeña para evitar límites de la API
-        const pausa =
-          (typeof FRAUD_CONFIG !== 'undefined' &&
-            FRAUD_CONFIG.analisis &&
-            FRAUD_CONFIG.analisis.pausaEntreConsultas) ||
-          100;
-        Utilities.sleep(pausa);
+
+        // Pausa basada en configuración para evitar límites de la API
+        Utilities.sleep(configFraude.analisis.pausaEntreConsultas);
       }
     }
     
@@ -68,6 +64,7 @@ function reAnalizarTodosPedidos() {
   }
   
   try {
+    const configFraude = obtenerConfigFraude();
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const hojaOrders = ss.getSheetByName('ORDERS');
     const datos = hojaOrders.getDataRange().getValues();
@@ -86,14 +83,9 @@ function reAnalizarTodosPedidos() {
         if (resultado.puntuacion >= 6) {
           sospechosos++;
         }
-        
-        // Pausa para evitar límites de API
-        const pausa =
-          (typeof FRAUD_CONFIG !== 'undefined' &&
-            FRAUD_CONFIG.analisis &&
-            FRAUD_CONFIG.analisis.pausaEntreConsultas) ||
-          100;
-        Utilities.sleep(pausa);
+
+        // Pausa basada en configuración para evitar límites de la API
+        Utilities.sleep(configFraude.analisis.pausaEntreConsultas);
       }
     }
     
@@ -113,6 +105,7 @@ function reAnalizarTodosPedidos() {
 
 function analizarPedidoFraude(datosQ, filaActual, todosDatos) {
   try {
+    const config = obtenerConfigFraude();
     // Extraer datos del formato de la columna Q
     const info = extraerInfoPedido(datosQ);
     
@@ -128,28 +121,28 @@ function analizarPedidoFraude(datosQ, filaActual, todosDatos) {
     let detalles = [];
     
     // 1. Análisis de geolocalización IP vs Dirección de entrega
-    const geoScore = analizarGeolocalizacion(info.ip, info.provincia, info.ciudad);
+    const geoScore = analizarGeolocalizacion(info.ip, info.provincia, info.ciudad, config);
     puntuacion += geoScore.puntos;
     if (geoScore.puntos > 0) detalles.push(geoScore.detalle);
     
     // 2. Análisis de repetición de IP en el mismo día
-    const ipScore = analizarRepeticionIP(info.ip, filaActual, todosDatos);
+    const ipScore = analizarRepeticionIP(info.ip, filaActual, todosDatos, config);
     puntuacion += ipScore.puntos;
     if (ipScore.puntos > 0) detalles.push(ipScore.detalle);
     
     // 3. Análisis de IP con múltiples direcciones diferentes
-    const multiScore = analizarIPMultiplesDirecciones(info.ip, info.direccionCompleta, filaActual, todosDatos);
+    const multiScore = analizarIPMultiplesDirecciones(info.ip, info.direccionCompleta, filaActual, todosDatos, config);
     puntuacion += multiScore.puntos;
     if (multiScore.puntos > 0) detalles.push(multiScore.detalle);
     
-    // Determinar etiqueta final
+    // Determinar etiqueta final usando umbrales de configuración
     let etiqueta;
-    if (puntuacion <= 2) {
-      etiqueta = '✅ CONFIABLE';
-    } else if (puntuacion <= 5) {
-      etiqueta = '⚠️ REVISAR';
+    if (puntuacion <= config.umbrales.confiable.max) {
+      etiqueta = config.umbrales.confiable.etiqueta;
+    } else if (puntuacion <= config.umbrales.revisar.max) {
+      etiqueta = config.umbrales.revisar.etiqueta;
     } else {
-      etiqueta = '🚨 SOSPECHOSO';
+      etiqueta = config.umbrales.sospechoso.etiqueta;
     }
     
     // Agregar puntuación a la etiqueta
@@ -203,20 +196,20 @@ function extraerInfoPedido(datosQ) {
 
 // ==== ANÁLISIS ESPECÍFICOS ====
 
-function analizarGeolocalizacion(ip, provinciaEntrega, ciudadEntrega) {
+function analizarGeolocalizacion(ip, provinciaEntrega, ciudadEntrega, config) {
   try {
-    // Usar API gratuita de ip-api.com (1000 consultas/mes)
-    const url = `http://ip-api.com/json/${ip}?fields=status,country,regionName,region,city&lang=es`;
-    const response = UrlFetchApp.fetch(url);
+    // Construir URL de consulta usando la configuración
+    const url = `${config.apis.geolocalizacion.url}${ip}?fields=${config.apis.geolocalizacion.camposConsulta}&lang=${config.apis.geolocalizacion.idioma}`;
+    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true, timeout: config.analisis.timeoutAPI });
     const data = JSON.parse(response.getContentText());
     
     if (data.status !== 'success') {
-      return { puntos: 1, detalle: 'IP no localizable' };
+      return { puntos: config.puntuaciones.ipNoLocalizable, detalle: 'IP no localizable' };
     }
     
     // Verificar si es España
     if (data.country !== 'Spain' && data.country !== 'España') {
-      return { puntos: 4, detalle: `IP desde ${data.country}` };
+      return { puntos: config.puntuaciones.ipExtranjera, detalle: `IP desde ${data.country}` };
     }
     
     // Comparar provincia
@@ -238,16 +231,15 @@ function analizarGeolocalizacion(ip, provinciaEntrega, ciudadEntrega) {
     }
     
     // Verificar provincias limítrofes (menor puntuación)
-    const provinciasMuyLejanas = ['canarias', 'baleares', 'ceuta', 'melilla'];
-    const esProvinciaLejana = provinciasMuyLejanas.some(p => 
+    const esProvinciaLejana = config.analisis.provinciasMuyLejanas.some(p =>
       provinciaIP.includes(p) || nombreProvinciaEntrega.includes(p)
     );
     
     if (esProvinciaLejana) {
-      return { puntos: 3, detalle: `IP desde ${data.regionName}, entrega en ${nombreProvinciaEntrega}` };
+      return { puntos: config.puntuaciones.ipProvinciaLejana, detalle: `IP desde ${data.regionName}, entrega en ${nombreProvinciaEntrega}` };
     }
-    
-    return { puntos: 2, detalle: `IP desde ${data.regionName}, entrega en ${nombreProvinciaEntrega}` };
+
+    return { puntos: config.puntuaciones.ipProvinciaDistinta, detalle: `IP desde ${data.regionName}, entrega en ${nombreProvinciaEntrega}` };
     
   } catch (error) {
     Logger.log('Error en analizarGeolocalizacion: ' + error.toString());
@@ -255,7 +247,7 @@ function analizarGeolocalizacion(ip, provinciaEntrega, ciudadEntrega) {
   }
 }
 
-function analizarRepeticionIP(ip, filaActual, todosDatos) {
+function analizarRepeticionIP(ip, filaActual, todosDatos, config) {
   try {
     const fechaActual = new Date();
     const inicioHoy = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), fechaActual.getDate());
@@ -279,9 +271,9 @@ function analizarRepeticionIP(ip, filaActual, todosDatos) {
         if (fechaPedido && fechaPedido >= inicioHoy) {
           contadorMismaIP++;
           
-          // Verificar si es de las últimas 2 horas
+          // Verificar si es de las últimas N horas según configuración
           const diferenciaHoras = (fechaActual - fechaPedido) / (1000 * 60 * 60);
-          if (diferenciaHoras <= 2) {
+          if (diferenciaHoras <= config.analisis.ventanaHorasRepeticion) {
             contadorUltimasHoras++;
           }
         }
@@ -290,11 +282,11 @@ function analizarRepeticionIP(ip, filaActual, todosDatos) {
     
     // Calcular puntuación
     if (contadorUltimasHoras >= 2) {
-      return { puntos: 3, detalle: `${contadorUltimasHoras + 1} pedidos con misma IP en 2h` };
+      return { puntos: config.puntuaciones.ipRepetida2Horas, detalle: `${contadorUltimasHoras + 1} pedidos con misma IP en ${config.analisis.ventanaHorasRepeticion}h` };
     } else if (contadorMismaIP >= 2) {
-      return { puntos: 2, detalle: `${contadorMismaIP + 1} pedidos con misma IP hoy` };
+      return { puntos: config.puntuaciones.ipRepetidaMismoDia, detalle: `${contadorMismaIP + 1} pedidos con misma IP hoy` };
     } else if (contadorMismaIP >= 1) {
-      return { puntos: 1, detalle: `IP repetida hoy` };
+      return { puntos: config.puntuaciones.ipRepetidaUnaVez, detalle: `IP repetida hoy` };
     }
     
     return { puntos: 0, detalle: '' };
@@ -305,7 +297,7 @@ function analizarRepeticionIP(ip, filaActual, todosDatos) {
   }
 }
 
-function analizarIPMultiplesDirecciones(ip, direccionActual, filaActual, todosDatos) {
+function analizarIPMultiplesDirecciones(ip, direccionActual, filaActual, todosDatos, config) {
   try {
     const direccionesUnicas = new Set();
     direccionesUnicas.add(direccionActual);
@@ -327,13 +319,13 @@ function analizarIPMultiplesDirecciones(ip, direccionActual, filaActual, todosDa
     
     // Calcular puntuación basada en número de direcciones diferentes
     const numDirecciones = direccionesUnicas.size;
-    
-    if (numDirecciones >= 4) {
-      return { puntos: 3, detalle: `IP usada en ${numDirecciones} direcciones diferentes` };
+
+    if (numDirecciones >= config.analisis.maximoDireccionesPorIP) {
+      return { puntos: config.puntuaciones.ip4DireccionesMas, detalle: `IP usada en ${numDirecciones} direcciones diferentes` };
     } else if (numDirecciones === 3) {
-      return { puntos: 2, detalle: `IP usada en 3 direcciones diferentes` };
+      return { puntos: config.puntuaciones.ip3Direcciones, detalle: `IP usada en 3 direcciones diferentes` };
     } else if (numDirecciones === 2) {
-      return { puntos: 1, detalle: `IP usada en 2 direcciones diferentes` };
+      return { puntos: config.puntuaciones.ip2Direcciones, detalle: `IP usada en 2 direcciones diferentes` };
     }
     
     return { puntos: 0, detalle: '' };

@@ -56,14 +56,8 @@ function actualizarPedidos() {
     const { hojaOrders, hojaWorksheet, datosOrders, datosWorksheet } = validarDatosCompletos();
     const cambios = [];
     
-    // Mapeo de columnas
-    const colOrders = {
-      id: 4,        // E - ID del pedido
-      nombre: 5,    // F - Nombre del cliente
-      telefono: 6,  // G - Teléfono
-      estado: 15,   // P - Estado del pedido
-      fecha: 3      // D - Fecha del pedido
-    };
+    // Mapeo de columnas tomado de la configuración central
+    const colOrders = obtenerColumnasOrders();
     
     const colWorksheet = {
       id: 1,        // B - ID del pedido con formato
