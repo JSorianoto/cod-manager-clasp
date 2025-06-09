@@ -305,6 +305,7 @@ function consultarIPConCache(ip) {
   }
 }
 
+
 // ==== FUNCIONES DE NOTIFICACIÓN ====
 
 function enviarNotificacionFraude(pedidosSospechosos) {

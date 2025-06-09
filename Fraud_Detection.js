@@ -247,6 +247,7 @@ function analizarGeolocalizacion(ip, provinciaEntrega, ciudadEntrega, config) {
   }
 }
 
+
 function analizarRepeticionIP(ip, filaActual, todosDatos, config) {
   try {
     const fechaActual = new Date();
