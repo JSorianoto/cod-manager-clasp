@@ -24,13 +24,17 @@ const DROPEA_CONFIG = {
 const MAPEO_ESTADOS = {
   'DELIVERED': 'Entregado',
   'CHARGED': 'Entregado',
-  'REJECTED': 'Devolucion', 
+  'REJECTED': 'Devolucion',
   'CANCELLED': 'Devolucion',
+  'RETURNED': 'Devolucion',
   'TRANSIT': 'En tránsito',
   'PREPARED': 'En tránsito',
   'INCIDENCE': 'INCIDENCIA',
   'PENDING': 'En tránsito'
 };
+
+// Estado a usar cuando se recibe un valor desconocido desde Dropea
+const ESTADO_DESCONOCIDO = 'INCIDENCIA';
 
 /**
  * FUNCIÓN PRINCIPAL - Actualizar desde Dropea
@@ -177,11 +181,10 @@ function procesarCambios(pedidosPendientes, estadosDropea) {
     }
     
     // Mapear estado de Dropea a nuestro sistema
-    const nuevoEstado = MAPEO_ESTADOS[estadoDropea];
-    
-    if (!nuevoEstado) {
-      Logger.log(`⚠️ Estado ${estadoDropea} no mapeado para pedido ${pedido.id}`);
-      continue;
+    const nuevoEstado = MAPEO_ESTADOS[estadoDropea] || ESTADO_DESCONOCIDO;
+
+    if (!MAPEO_ESTADOS[estadoDropea]) {
+      Logger.log(`⚠️ Estado ${estadoDropea} no mapeado para pedido ${pedido.id}, usando ${ESTADO_DESCONOCIDO}`);
     }
     
     // Solo actualizar si hay cambio real
