@@ -329,6 +329,13 @@ function obtenerMapaProvincias() {
 }
 
 /**
+ * Devuelve el mapeo de columnas para la hoja ORDERS
+ */
+function obtenerColumnasOrders() {
+  return CONFIG.columnas.orders;
+}
+
+/**
  * Obtiene configuración de una sección específica
  */
 function obtenerConfigSeccion(seccion) {
