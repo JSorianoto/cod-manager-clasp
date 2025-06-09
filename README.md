@@ -12,6 +12,18 @@ This project synchronizes orders with the Dropea API. The API key is no longer h
 
 Once these properties are set, the scripts `Dropea_Update.js` and `COD_Manager_Dropea.js` will automatically read the token and endpoint from the script properties.
 
+## Fraud Detection Settings
+
+Antifraud thresholds and API options live in `Config.js` under `FRAUD_CONFIG`.
+Relevant fields include:
+
+- `analisis.timeoutAPI` – timeout passed to `UrlFetchApp.fetch` when querying the IP API.
+- `analisis.pausaEntreConsultas` – delay between API calls.
+- `analisis.ventanaHorasRepeticion` – hours considered when checking repeated IPs.
+- `apis.geolocalizacion.url` and related fields – endpoint used for IP lookups.
+
+Adjust these values if your detection rules or provider settings differ.
+
 ## Deploying the Apps Script
 1. Install Node.js and the [clasp](https://github.com/google/clasp) tool: `npm install -g @google/clasp`.
 2. Run `clasp login` and authorize your Google account.
@@ -31,6 +43,7 @@ Create triggers from **Triggers → Add Trigger** in the editor:
 Adjust the frequency as needed.
 
 ## Example Usage
+
 **Running Fraud Analysis**
 1. Open your spreadsheet.
 2. Choose **📦 COD Manager → 🛡️ Análisis de Fraude → 🔍 Analizar Nuevos Pedidos**.
