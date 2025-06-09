@@ -35,7 +35,12 @@ function analizarNuevosPedidos() {
         }
         
         // Pausa pequeña para evitar límites de la API
-        Utilities.sleep(100);
+        const pausa =
+          (typeof FRAUD_CONFIG !== 'undefined' &&
+            FRAUD_CONFIG.analisis &&
+            FRAUD_CONFIG.analisis.pausaEntreConsultas) ||
+          100;
+        Utilities.sleep(pausa);
       }
     }
     
@@ -83,7 +88,12 @@ function reAnalizarTodosPedidos() {
         }
         
         // Pausa para evitar límites de API
-        Utilities.sleep(100);
+        const pausa =
+          (typeof FRAUD_CONFIG !== 'undefined' &&
+            FRAUD_CONFIG.analisis &&
+            FRAUD_CONFIG.analisis.pausaEntreConsultas) ||
+          100;
+        Utilities.sleep(pausa);
       }
     }
     

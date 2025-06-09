@@ -141,7 +141,12 @@ function ejecutarAnalisisAntifraude() {
           sospechosos++;
         }
         
-        Utilities.sleep(100);
+        const pausa =
+          (typeof FRAUD_CONFIG !== 'undefined' &&
+            FRAUD_CONFIG.analisis &&
+            FRAUD_CONFIG.analisis.pausaEntreConsultas) ||
+          100;
+        Utilities.sleep(pausa);
       }
     }
     
