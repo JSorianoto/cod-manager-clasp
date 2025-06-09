@@ -191,6 +191,40 @@ function crearLogAntifraude(analisisRealizados, sospechososDetectados) {
   }
 }
 
+function crearLogBot(evento, detalle) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let hojaLogBot = ss.getSheetByName('LOG_BOT');
+
+    if (!hojaLogBot) {
+      hojaLogBot = ss.insertSheet('LOG_BOT');
+      hojaLogBot.getRange(1, 1, 1, 4).setValues([
+        ['Fecha/Hora', 'Evento', 'Detalle', 'Usuario']
+      ]);
+      const headerRange = hojaLogBot.getRange(1, 1, 1, 4);
+      headerRange.setBackground('#e8eaf6');
+      headerRange.setFontWeight('bold');
+    }
+
+    const timestamp = new Date();
+    const usuario = Session.getActiveUser().getEmail();
+    const nuevaFila = [timestamp, evento, detalle || 'N/A', usuario];
+    const ultimaFila = hojaLogBot.getLastRow();
+    hojaLogBot.getRange(ultimaFila + 1, 1, 1, 4).setValues([nuevaFila]);
+
+  } catch (error) {
+    Logger.log('Error al crear log bot: ' + error.toString());
+  }
+}
+
+function logBotMensaje(chatId, mensaje) {
+  crearLogBot('MENSAJE', `Chat ${chatId}: ${mensaje}`);
+}
+
+function logBotActualizacion(chatId, descripcion) {
+  crearLogBot('ACTUALIZACION', `Chat ${chatId}: ${descripcion}`);
+}
+
 // ==== FUNCIONES DE FECHA Y TIEMPO ====
 
 function obtenerFechaHoy() {
