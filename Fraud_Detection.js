@@ -34,7 +34,7 @@ function analizarNuevosPedidos() {
         if (resultado.puntuacion >= 6) {
           sospechosos++;
         }
-        
+
         // Pausa basada en configuración para evitar límites de la API
         Utilities.sleep(configFraude.analisis.pausaEntreConsultas);
       }
@@ -83,8 +83,8 @@ function reAnalizarTodosPedidos() {
         if (resultado.puntuacion >= 6) {
           sospechosos++;
         }
-        
-        // Pausa para evitar límites de API
+
+        // Pausa basada en configuración para evitar límites de la API
         Utilities.sleep(configFraude.analisis.pausaEntreConsultas);
       }
     }
