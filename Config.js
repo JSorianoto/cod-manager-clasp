@@ -210,7 +210,8 @@ const LOG_CONFIG = {
   
   hojas: {
     actualizaciones: 'LOG_ACTUALIZACIONES',
-    antifraude: 'LOG_ANTIFRAUDE'
+    antifraude: 'LOG_ANTIFRAUDE',
+    bot: 'LOG_BOT'
   },
   
   encabezados: {
@@ -219,14 +220,18 @@ const LOG_CONFIG = {
       'Estado Anterior', 'Estado Nuevo', 'Usuario', 'Observaciones'
     ],
     antifraude: [
-      'Fecha/Hora', 'Tipo Análisis', 'Pedidos Analizados', 
+      'Fecha/Hora', 'Tipo Análisis', 'Pedidos Analizados',
       'Sospechosos Detectados', 'Tasa Detección', 'Usuario'
+    ],
+    bot: [
+      'Fecha/Hora', 'Evento', 'Detalle', 'Usuario'
     ]
   },
   
   colores: {
     encabezados: '#f1f3f4',
-    encabezadosAntifraude: '#fff3e0'
+    encabezadosAntifraude: '#fff3e0',
+    encabezadosBot: '#e8eaf6'
   },
   
   retencion: {
