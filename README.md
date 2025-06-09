@@ -11,3 +11,17 @@ This project synchronizes orders with the Dropea API. The API key is no longer h
 4. Save the properties and redeploy the project if necessary.
 
 Once these properties are set, the scripts `Dropea_Update.js` and `COD_Manager_Dropea.js` will automatically read the token and endpoint from the script properties.
+
+## Order State Mapping
+
+`Dropea_Update.js` contains a mapping from Dropea's `OrderStateEnum` to the
+values used in the spreadsheet. The main states are:
+
+| Dropea state | Sheet value |
+|--------------|-------------|
+| `DELIVERED`, `CHARGED` | `Entregado` |
+| `REJECTED`, `CANCELLED`, `RETURNED` | `Devolucion` |
+| `TRANSIT`, `PREPARED`, `PENDING` | `En tránsito` |
+| `INCIDENCE` | `INCIDENCIA` |
+
+Any unrecognized state falls back to `INCIDENCIA` and a warning is logged.
