@@ -11,3 +11,15 @@ This project synchronizes orders with the Dropea API. The API key is no longer h
 4. Save the properties and redeploy the project if necessary.
 
 Once these properties are set, the scripts `Dropea_Update.js` and `COD_Manager_Dropea.js` will automatically read the token and endpoint from the script properties.
+
+## Fraud Detection Settings
+
+Antifraud thresholds and API options live in `Config.js` under `FRAUD_CONFIG`.
+Relevant fields include:
+
+- `analisis.timeoutAPI` – timeout passed to `UrlFetchApp.fetch` when querying the IP API.
+- `analisis.pausaEntreConsultas` – delay between API calls.
+- `analisis.ventanaHorasRepeticion` – hours considered when checking repeated IPs.
+- `apis.geolocalizacion.url` and related fields – endpoint used for IP lookups.
+
+Adjust these values if your detection rules or provider settings differ.

@@ -225,72 +225,6 @@ function formatearFecha(fecha) {
   });
 }
 
-// ==== FUNCIONES DE CONFIGURACIÓN ====
-
-function obtenerConfiguracion() {
-  const configuracionDefecto = {
-    // Puntuaciones del sistema antifraude
-    puntuaciones: {
-      ipExtranjera: 4,
-      ipProvinciaLejana: 3,
-      ipProvinciaDistinta: 2,
-      ipRepetidaMismaHora: 3,
-      ipRepetidaMismoDia: 2,
-      ipMultiplesDirecciones2: 1,
-      ipMultiplesDirecciones3: 2,
-      ipMultiplesDirecciones4: 3
-    },
-    
-    // Umbrales de clasificación
-    umbrales: {
-      confiable: 2,
-      revisar: 5,
-      sospechoso: 6
-    },
-    
-    // Configuración de APIs
-    apis: {
-      geolocalizacion: 'ip-api.com',
-      limiteMensual: 1000,
-      timeoutSegundos: 5
-    },
-    
-    // Configuración de análisis
-    analisis: {
-      ventanaHorasRepeticion: 2,
-      maximoDireccionesPorIP: 4,
-      pausaEntreConsultas: 100 // milisegundos
-    }
-  };
-  
-  return configuracionDefecto;
-}
-
-function actualizarConfiguracion(nuevaConfig) {
-  try {
-    // Esta función podría expandirse para guardar configuración en una hoja
-    // Por ahora, solo validamos la configuración
-    
-    if (!nuevaConfig || typeof nuevaConfig !== 'object') {
-      throw new Error('Configuración inválida');
-    }
-    
-    // Validar estructura básica
-    const requeridos = ['puntuaciones', 'umbrales', 'apis', 'analisis'];
-    for (let campo of requeridos) {
-      if (!nuevaConfig[campo]) {
-        throw new Error(`Campo requerido faltante: ${campo}`);
-      }
-    }
-    
-    return true;
-    
-  } catch (error) {
-    Logger.log('Error al actualizar configuración: ' + error.toString());
-    return false;
-  }
-}
-
 // ==== FUNCIONES DE RENDIMIENTO Y OPTIMIZACIÓN ====
 
 function limpiarCacheIP() {
@@ -308,6 +242,7 @@ function limpiarCacheIP() {
 
 function consultarIPConCache(ip) {
   try {
+    const config = obtenerConfigFraude();
     const cache = CacheService.getScriptCache();
     const cacheKey = `ip_${ip}`;
     
@@ -319,13 +254,13 @@ function consultarIPConCache(ip) {
     }
     
     // Si no está en cache, hacer consulta nueva
-    const url = `http://ip-api.com/json/${ip}?fields=status,country,regionName,region,city&lang=es`;
-    const response = UrlFetchApp.fetch(url);
+    const url = `${config.apis.geolocalizacion.url}${ip}?fields=${config.apis.geolocalizacion.camposConsulta}&lang=${config.apis.geolocalizacion.idioma}`;
+    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true, timeout: config.analisis.timeoutAPI });
     const data = JSON.parse(response.getContentText());
     
-    // Guardar en cache por 24 horas (86400 segundos)
+    // Guardar en cache según configuración
     if (data.status === 'success') {
-      cache.put(cacheKey, JSON.stringify(data), 86400);
+      cache.put(cacheKey, JSON.stringify(data), config.apis.geolocalizacion.cacheDuracion);
     }
     
     return data;
