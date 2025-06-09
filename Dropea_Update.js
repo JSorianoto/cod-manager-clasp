@@ -109,42 +109,54 @@ function obtenerPedidosPendientes() {
 }
 
 /**
- * Consultar estados en Dropea (últimos 500 pedidos)
+ * Consultar estados en Dropea recorriendo todas las páginas
  */
 function consultarEstadosDropea() {
-  const query = `
-    query {
-      orders(sort: CREATED_AT, direction: DESC, limit: 500) {
-        data {
-          id
-          status
-          external_order_id
-          created_at
+  let pagina = 1;
+  let hayMasPaginas = true;
+  let paginasConsultadas = 0;
+  const estadosMap = {};
+
+  while (hayMasPaginas) {
+    const query = `
+      query {
+        orders(sort: CREATED_AT, direction: DESC, limit: 500, page: ${pagina}) {
+          data {
+            id
+            status
+            external_order_id
+            created_at
+          }
+          paginatorInfo {
+            hasMorePages
+          }
         }
       }
+    `;
+
+    Logger.log(`🔍 Consultando estados en Dropea (página ${pagina})...`);
+    const response = consultarGraphQL(query);
+
+    if (response.errors) {
+      throw new Error('Error consultando Dropea: ' + JSON.stringify(response.errors));
     }
-  `;
-  
-  Logger.log('🔍 Consultando estados en Dropea...');
-  const response = consultarGraphQL(query);
-  
-  if (response.errors) {
-    throw new Error('Error consultando Dropea: ' + JSON.stringify(response.errors));
-  }
-  
-  if (!response.data || !response.data.orders || !response.data.orders.data) {
-    throw new Error('Respuesta inesperada de Dropea');
-  }
-  
-  // Convertir a mapa para búsqueda rápida
-  const estadosMap = {};
-  response.data.orders.data.forEach(pedido => {
-    if (pedido.external_order_id) {
-      estadosMap[pedido.external_order_id] = pedido.status;
+
+    if (!response.data || !response.data.orders || !response.data.orders.data) {
+      throw new Error('Respuesta inesperada de Dropea');
     }
-  });
-  
-  Logger.log(`📊 Estados obtenidos de ${Object.keys(estadosMap).length} pedidos`);
+
+    response.data.orders.data.forEach(pedido => {
+      if (pedido.external_order_id) {
+        estadosMap[pedido.external_order_id] = pedido.status;
+      }
+    });
+
+    hayMasPaginas = !!(response.data.orders.paginatorInfo && response.data.orders.paginatorInfo.hasMorePages);
+    pagina++;
+    paginasConsultadas++;
+  }
+
+  Logger.log(`📊 Estados obtenidos de ${Object.keys(estadosMap).length} pedidos en ${paginasConsultadas} páginas`);
   return estadosMap;
 }
 
