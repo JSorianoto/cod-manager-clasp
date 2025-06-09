@@ -7,12 +7,14 @@
 /**
  * CONFIGURACIÓN
  */
+const SCRIPT_PROPERTIES = PropertiesService.getScriptProperties();
 const DROPEA_CONFIG = {
-  API_URL: 'https://api.dropea.com/graphql/dropshippers',
-  API_KEY: 'AIzaejsD46ULeywoDCvhFgWGOYvRkokx03l3NDeohz2wCo8=',
+  API_URL: SCRIPT_PROPERTIES.getProperty('DROPEA_API_URL') ||
+    'https://api.dropea.com/graphql/dropshippers',
+  API_KEY: SCRIPT_PROPERTIES.getProperty('DROPEA_API_KEY'),
   HEADERS: {
     'Content-Type': 'application/json',
-    'x-api-key': 'AIzaejsD46ULeywoDCvhFgWGOYvRkokx03l3NDeohz2wCo8='
+    'x-api-key': SCRIPT_PROPERTIES.getProperty('DROPEA_API_KEY')
   }
 };
 

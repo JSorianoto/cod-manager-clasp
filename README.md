@@ -1,0 +1,13 @@
+# COD Manager - Dropea Integration
+
+This project synchronizes orders with the Dropea API. The API key is no longer hard-coded in the code. Instead, it is read from **Script Properties** in your Apps Script project.
+
+## Setting the Script Properties
+1. Open the project in the Google Apps Script editor.
+2. Choose **File → Project properties** and open the **Script Properties** tab.
+3. Create the following keys and paste your values:
+   - `DROPEA_API_KEY` – Dropea API token.
+   - `DROPEA_API_URL` – optional custom endpoint. If not set, the default endpoint `https://api.dropea.com/graphql/dropshippers` is used.
+4. Save the properties and redeploy the project if necessary.
+
+Once these properties are set, the scripts `Dropea_Update.js` and `COD_Manager_Dropea.js` will automatically read the token and endpoint from the script properties.
