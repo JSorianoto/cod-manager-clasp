@@ -105,7 +105,7 @@ function actualizarPedidosDesdeDropea() {
 
 // Función para obtener pedidos de Dropea API
 function obtenerPedidosDropea() {
-  const TOKEN = 'AIza0g6jlFCN1vqnxCPj1Pr0-qgmIG2HNIgZcFiF6C522IQ=';
+  const token = PropertiesService.getScriptProperties().getProperty('DROPEA_API_KEY');
   
   try {
     Logger.log('📡 Consultando pedidos desde Dropea API...');
@@ -129,7 +129,7 @@ function obtenerPedidosDropea() {
     const options = {
       method: 'POST',
       headers: {
-        'X-api-key': TOKEN,
+        'X-api-key': token,
         'Content-Type': 'application/json'
       },
       payload: JSON.stringify({ query: query })
