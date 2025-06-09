@@ -2,7 +2,10 @@
 // COD MANAGER - INTEGRACIÓN CON DROPEA API
 // ===================================================================
 // Archivo: COD_Manager_Dropea.gs
-// Descripción: Versión adaptada para usar Dropea API directamente
+// Descripción: Versión adaptada para usar Dropea API directamente.
+//              La función `obtenerPedidosDropea` recorre todas las páginas
+//              de la API usando los parámetros `page` y `limit` y devuelve
+//              un único arreglo con todos los pedidos encontrados.
 // ===================================================================
 
 function actualizarPedidosDesdeDropea() {
@@ -99,53 +102,79 @@ function actualizarPedidosDesdeDropea() {
 
 // Función para obtener pedidos de Dropea API
 function obtenerPedidosDropea() {
-  const token = PropertiesService.getScriptProperties().getProperty('DROPEA_API_KEY');
-  
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty('DROPEA_API_KEY');
+  const apiUrl = props.getProperty('DROPEA_API_URL') ||
+    'https://api.dropea.com/graphql/dropshippers';
+
+  const pedidos = [];
+  const limit = 50;
+  let page = 1;
+  let totalPages = 1;
+
   try {
     Logger.log('📡 Consultando pedidos desde Dropea API...');
-    
-    // Consultar pedidos recientes (último mes)
-    const query = `
-      query {
-        orders(limit: 50) {
-          data {
-            id
-            status
-            external_order_id
-            tracking_code
-            created_at
-            delivered_at
+
+    while (page <= totalPages) {
+      const query = `
+        query ($page: Int!, $limit: Int!) {
+          orders(page: $page, limit: $limit) {
+            data {
+              id
+              status
+              external_order_id
+              tracking_code
+              created_at
+              delivered_at
+            }
+            pagination {
+              page
+              pages
+            }
           }
         }
+      `;
+
+      const payload = {
+        query: query,
+        variables: { page: page, limit: limit }
+      };
+
+      const options = {
+        method: 'POST',
+        headers: {
+          'X-api-key': token,
+          'Content-Type': 'application/json'
+        },
+        payload: JSON.stringify(payload)
+      };
+
+      const response = UrlFetchApp.fetch(apiUrl, options);
+
+      if (response.getResponseCode() !== 200) {
+        Logger.log(`❌ Error HTTP: ${response.getResponseCode()}`);
+        break;
       }
-    `;
-    
-    const options = {
-      method: 'POST',
-      headers: {
-        'X-api-key': token,
-        'Content-Type': 'application/json'
-      },
-      payload: JSON.stringify({ query: query })
-    };
-    
-    const response = UrlFetchApp.fetch('https://api.dropea.com/graphql/dropshippers', options);
-    
-    if (response.getResponseCode() === 200) {
+
       const data = JSON.parse(response.getContentText());
-      
+
       if (data.data && data.data.orders && data.data.orders.data) {
-        Logger.log(`✅ Obtenidos ${data.data.orders.data.length} pedidos de Dropea`);
-        return data.data.orders.data;
+        pedidos.push.apply(pedidos, data.data.orders.data);
+        if (data.data.orders.pagination) {
+          totalPages = data.data.orders.pagination.pages || totalPages;
+        }
+        Logger.log(`📄 Página ${page} obtenida (${data.data.orders.data.length} pedidos)`);
       } else {
-        Logger.log('⚠️ No se encontraron pedidos en Dropea');
-        return [];
+        Logger.log('⚠️ Respuesta inesperada de Dropea');
+        break;
       }
-    } else {
-      Logger.log(`❌ Error HTTP: ${response.getResponseCode()}`);
-      return [];
+
+      page++;
     }
-    
+
+    Logger.log(`✅ Total de pedidos obtenidos: ${pedidos.length}`);
+    return pedidos;
+
   } catch (error) {
     Logger.log('💥 Error obteniendo pedidos de Dropea: ' + error.toString());
     return [];
