@@ -196,7 +196,7 @@ function extraerInfoPedido(datosQ) {
 function analizarGeolocalizacion(ip, provinciaEntrega, ciudadEntrega) {
   try {
     // Usar API gratuita de ip-api.com (1000 consultas/mes)
-    const url = `http://ip-api.com/json/${ip}?fields=status,country,regionName,region,city&lang=es`;
+    const url = `https://ip-api.com/json/${ip}?fields=status,country,regionName,region,city&lang=es`;
     const response = UrlFetchApp.fetch(url);
     const data = JSON.parse(response.getContentText());
     

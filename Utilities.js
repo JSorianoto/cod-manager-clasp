@@ -319,7 +319,7 @@ function consultarIPConCache(ip) {
     }
     
     // Si no está en cache, hacer consulta nueva
-    const url = `http://ip-api.com/json/${ip}?fields=status,country,regionName,region,city&lang=es`;
+    const url = `https://ip-api.com/json/${ip}?fields=status,country,regionName,region,city&lang=es`;
     const response = UrlFetchApp.fetch(url);
     const data = JSON.parse(response.getContentText());
     
