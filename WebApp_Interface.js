@@ -133,7 +133,7 @@ function ejecutarAnalisisAntifraude() {
       const analisisAnterior = datos[i][17]; // Columna R
       
       if (datosColumnaQ && (!analisisAnterior || analisisAnterior.trim() === '')) {
-        const resultado = analizarPedidoFraude(datosColumnaQ, i + 1, datos);
+        const resultado = analizarPedidoFraudeHistorico(datosColumnaQ, i + 1, datos);
         hojaOrders.getRange(i + 1, 18).setValue(resultado.etiqueta);
         procesados++;
         
