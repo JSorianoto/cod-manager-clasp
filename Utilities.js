@@ -261,12 +261,38 @@ function formatearFecha(fecha) {
 
 // ==== FUNCIONES DE RENDIMIENTO Y OPTIMIZACIÓN ====
 
-function limpiarCacheIP() {
+function registrarIPEnCache(ip) {
   try {
-    // Limpiar cache de consultas IP si existe
+    const props = PropertiesService.getScriptProperties();
+    const key = 'IP_CACHE_KEYS';
+    const data = props.getProperty(key);
+    const ips = data ? JSON.parse(data) : [];
+    if (ips.indexOf(ip) === -1) {
+      ips.push(ip);
+      props.setProperty(key, JSON.stringify(ips));
+    }
+  } catch (e) {
+    Logger.log('Error registrando IP en cache: ' + e.toString());
+  }
+}
+
+function obtenerIPsEnCache() {
+  const props = PropertiesService.getScriptProperties();
+  const data = props.getProperty('IP_CACHE_KEYS');
+  return data ? JSON.parse(data) : [];
+}
+
+function limpiarCacheIPs() {
+  try {
     const cache = CacheService.getScriptCache();
-    cache.removeAll(['ip_cache']);
-    
+    const ips = obtenerIPsEnCache();
+    if (ips.length > 0) {
+      const keys = ips.map(ip => `ip_${ip}`);
+      for (let i = 0; i < keys.length; i += 100) {
+        cache.removeAll(keys.slice(i, i + 100));
+      }
+    }
+    PropertiesService.getScriptProperties().deleteProperty('IP_CACHE_KEYS');
     return true;
   } catch (error) {
     Logger.log('Error al limpiar cache: ' + error.toString());
@@ -295,6 +321,7 @@ function consultarIPConCache(ip) {
     // Guardar en cache según configuración
     if (data.status === 'success') {
       cache.put(cacheKey, JSON.stringify(data), config.apis.geolocalizacion.cacheDuracion);
+      registrarIPEnCache(ip);
     }
     
     return data;
@@ -369,7 +396,7 @@ function limpiarDatosAntiguos() {
     });
     
     // Limpiar cache
-    limpiarCacheIP();
+    limpiarCacheIPs();
     
     Logger.log('Limpieza de datos antiguos completada');
     return true;
@@ -394,7 +421,7 @@ function ejecutarMantenimientoAutomatico() {
     }
     
     // 3. Limpiar cache IP
-    limpiarCacheIP();
+    limpiarCacheIPs();
     
     Logger.log('Mantenimiento automático completado: ' + new Date());
     

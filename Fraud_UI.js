@@ -590,3 +590,24 @@ function mostrarGuiaAntifraude() {
   SpreadsheetApp.getUi()
     .showModalDialog(htmlOutput, 'Guía del Sistema Antifraude');
 }
+
+// ==== GESTIÓN DE CACHE DE IPs ====
+
+function limpiarCacheIPsUI() {
+  const ui = SpreadsheetApp.getUi();
+  const resp = ui.alert('¿Limpiar la cache de IPs almacenadas?', ui.ButtonSet.YES_NO);
+  if (resp === ui.Button.YES) {
+    const ok = limpiarCacheIPs();
+    ui.alert(ok ? 'Cache de IPs limpiada.' : 'Error al limpiar la cache.');
+  }
+}
+
+function mostrarEstadisticasCache() {
+  try {
+    const total = obtenerIPsEnCache().length;
+    SpreadsheetApp.getUi().alert(`Actualmente hay ${total} IP(s) en cache.`);
+  } catch (error) {
+    SpreadsheetApp.getUi().alert('Error: ' + error.toString());
+    Logger.log('Error en mostrarEstadisticasCache: ' + error.toString());
+  }
+}
