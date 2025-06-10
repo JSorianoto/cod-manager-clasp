@@ -163,7 +163,8 @@ const FRAUD_CONFIG = {
       camposConsulta: 'status,country,regionName,region,city',
       idioma: 'es',
       limiteMensual: 1000,
-      cacheDuracion: 86400 // 24 horas en segundos
+      // Duración del cache de resultados de geolocalización
+      cacheDuracion: 172800 // 48 horas en segundos
     }
   }
 };
