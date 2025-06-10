@@ -60,8 +60,34 @@ const CONFIG = {
       hacia: 'Entregado',
       resultado: 'I. ENTREGADO'
     }
-  }
+  } 
 };
+
+// ==== MAPEO ESTADOS DROPEA ====
+/**
+ * Conversión de estados devueltos por la API de Dropea
+ * hacia los valores utilizados en la hoja ORDERS.
+ */
+const DROPEA_STATUS_MAP = {
+  'DELIVERED': 'Entregado',
+  'CHARGED': 'Entregado',
+  'REJECTED': 'Devolucion',
+  'CANCELLED': 'Devolucion',
+  'RETURNED': 'Devolucion',
+  'TRANSIT': 'En tránsito',
+  'PREPARED': 'En tránsito',
+  'PENDING': 'En tránsito',
+  'INCIDENCE': 'INCIDENCIA'
+};
+
+/**
+ * Devuelve el estado equivalente usado en la hoja ORDERS.
+ * Si el valor proporcionado no está en el mapeo,
+ * se devuelve "INCIDENCIA".
+ */
+function convertirEstadoDropea(estado) {
+  return DROPEA_STATUS_MAP[estado] || 'INCIDENCIA';
+}
 
 // ==== CONFIGURACIÓN SISTEMA ANTIFRAUDE ====
 

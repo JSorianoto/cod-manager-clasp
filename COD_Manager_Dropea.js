@@ -40,9 +40,11 @@ function actualizarPedidosDesdeDropea() {
       
       if (!idShopify || !estadoDropea) continue;
       
-      // Convertir estado de Dropea a tu sistema
+      // Convertir estado de Dropea a tu sistema usando el mapeo global
       const nuevoEstado = convertirEstadoDropea(estadoDropea);
-      if (!nuevoEstado) continue; // Ignorar estados no válidos
+      if (!DROPEA_STATUS_MAP[estadoDropea]) {
+        Logger.log(`⚠️ Estado ${estadoDropea} no mapeado para pedido ${idShopify}, usando INCIDENCIA`);
+      }
       
       // Buscar en ORDERS por ID de Shopify
       for (let j = 1; j < datosOrders.length; j++) {
@@ -181,17 +183,6 @@ function obtenerPedidosDropea() {
   }
 }
 
-// Función para convertir estados de Dropea a tu sistema
-function convertirEstadoDropea(estadoDropea) {
-  const mapeoEstados = {
-    'CHARGED': 'Entregado',     // Cobrado = Entregado
-    'DELIVERED': 'Entregado',   // Entregado = Entregado  
-    'REJECTED': 'Devolucion',   // Rechazado = Devolucion
-    'INCIDENCE': 'INCIDENCIA'   // Incidencia = INCIDENCIA
-  };
-  
-  return mapeoEstados[estadoDropea] || null;
-}
 
 // Función para mostrar el diálogo con los cambios (adaptada)
 function mostrarDialogoActualizarDropea() {
