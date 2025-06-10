@@ -41,3 +41,7 @@ Adjust these values if your detection rules or provider settings differ.
 
 The `Limpiar LOG de sincronización` option clears the `LOG_Dropea_Sync` sheet,
 leaving only the headers. Use it periodically to keep the log small.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

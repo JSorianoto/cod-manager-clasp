@@ -1,0 +1,11 @@
+# Ignore Google Apps Script clasp config
+.clasp.json
+
+# Node dependencies
+node_modules/
+
+# Editor directories and logs
+.vscode/
+.idea/
+*.log
+logs/
