@@ -1,11 +1,44 @@
-# Ignore Google Apps Script clasp config
+# ===================================================================
+# .gitignore - Versión consolidada sin conflictos
+# ===================================================================
+
+# Google Apps Script
 .clasp.json
+appsscript.json
 
-# Node dependencies
+# Node.js (para framework de pruebas agregado por Codex)
 node_modules/
+package-lock.json
+yarn.lock
+npm-debug.log*
 
-# Editor directories and logs
+# Archivos de configuración local
+config.local.js
+.env
+.env.local
+
+# Archivos temporales y logs
+*.tmp
+*.log
+*.bak
+logs/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Editores
 .vscode/
 .idea/
-*.log
-logs/
+*.swp
+*.swo
+*~
+
+# Testing (agregado por Codex)
+coverage/
+*.test.js.snapshot
+test-results/
+
+# Build y distribución
+dist/
+build/
