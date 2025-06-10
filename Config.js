@@ -159,7 +159,7 @@ const FRAUD_CONFIG = {
   apis: {
     geolocalizacion: {
       proveedor: 'ip-api.com',
-      url: 'http://ip-api.com/json/',
+      url: 'https://ip-api.com/json/',
       camposConsulta: 'status,country,regionName,region,city',
       idioma: 'es',
       limiteMensual: 1000,
