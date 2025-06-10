@@ -36,3 +36,8 @@ Antifraud thresholds and API options live in `Config.js` under `FRAUD_CONFIG`. R
 - `apis.geolocalizacion.url` and related fields – endpoint used for IP lookups.
 
 Adjust these values if your detection rules or provider settings differ.
+
+## Maintenance Tools
+
+The `Limpiar LOG de sincronización` option clears the `LOG_Dropea_Sync` sheet,
+leaving only the headers. Use it periodically to keep the log small.
