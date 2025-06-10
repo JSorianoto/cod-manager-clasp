@@ -154,7 +154,14 @@ const FRAUD_CONFIG = {
       'canarias', 'baleares', 'ceuta', 'melilla'
     ]
   },
-  
+
+  // ==== CONFIGURACIÓN DE HISTORIAL ====
+  historial: {
+    diasAnalisis: 30,             // Días hacia atrás para revisar historial
+    repeticionesSospechosas: 3,   // Pedidos previos necesarios para sumar puntos
+    puntosPorRepeticion: 2        // Puntos extra al superar el umbral
+  },
+
   // ==== CONFIGURACIÓN DE APIs ====
   apis: {
     geolocalizacion: {

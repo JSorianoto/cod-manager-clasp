@@ -34,8 +34,18 @@ Antifraud thresholds and API options live in `Config.js` under `FRAUD_CONFIG`. R
 - `analisis.pausaEntreConsultas` – delay between API calls.
 - `analisis.ventanaHorasRepeticion` – hours considered when checking repeated IPs.
 - `apis.geolocalizacion.url` and related fields – endpoint used for IP lookups.
+- `historial.diasAnalisis` – days back to look for previous orders with the same IP.
+- `historial.repeticionesSospechosas` – previous orders needed before adding extra risk.
+- `historial.puntosPorRepeticion` – risk score added when the history threshold is hit.
 
 Adjust these values if your detection rules or provider settings differ.
+
+### History-Based Analysis
+
+`Fraud_Detection_Enhanced.js` introduces checks against previous orders.
+The menu entries **Analizar Nuevos Pedidos** and **Re-analizar Todos**
+now run this enhanced analysis, looking back a configurable number of days
+for repeated IP usage.
 
 ## Maintenance Tools
 
