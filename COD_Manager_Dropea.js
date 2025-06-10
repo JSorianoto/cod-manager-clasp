@@ -143,7 +143,7 @@ function obtenerPedidosDropea() {
       const options = {
         method: 'POST',
         headers: {
-          'X-api-key': token,
+          'x-api-key': token,
           'Content-Type': 'application/json'
         },
         payload: JSON.stringify(payload)
