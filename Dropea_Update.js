@@ -19,22 +19,10 @@ const DROPEA_CONFIG = {
 };
 
 /**
- * MAPEO DE ESTADOS - Dropea → Tu Sistema
+ * Utiliza el mapeo centralizado para convertir los estados
+ * devueltos por Dropea.
+ * Ver Config.js para el listado completo.
  */
-const MAPEO_ESTADOS = {
-  'DELIVERED': 'Entregado',
-  'CHARGED': 'Entregado',
-  'REJECTED': 'Devolucion',
-  'CANCELLED': 'Devolucion',
-  'RETURNED': 'Devolucion',
-  'TRANSIT': 'En tránsito',
-  'PREPARED': 'En tránsito',
-  'INCIDENCE': 'INCIDENCIA',
-  'PENDING': 'En tránsito'
-};
-
-// Estado a usar cuando se recibe un valor desconocido desde Dropea
-const ESTADO_DESCONOCIDO = 'INCIDENCIA';
 
 /**
  * FUNCIÓN PRINCIPAL - Actualizar desde Dropea
@@ -180,11 +168,11 @@ function procesarCambios(pedidosPendientes, estadosDropea) {
       continue;
     }
     
-    // Mapear estado de Dropea a nuestro sistema
-    const nuevoEstado = MAPEO_ESTADOS[estadoDropea] || ESTADO_DESCONOCIDO;
+    // Mapear estado de Dropea a nuestro sistema usando el helper
+    const nuevoEstado = convertirEstadoDropea(estadoDropea);
 
-    if (!MAPEO_ESTADOS[estadoDropea]) {
-      Logger.log(`⚠️ Estado ${estadoDropea} no mapeado para pedido ${pedido.id}, usando ${ESTADO_DESCONOCIDO}`);
+    if (!DROPEA_STATUS_MAP[estadoDropea]) {
+      Logger.log(`⚠️ Estado ${estadoDropea} no mapeado para pedido ${pedido.id}, usando INCIDENCIA`);
     }
     
     // Solo actualizar si hay cambio real
