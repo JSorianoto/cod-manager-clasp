@@ -444,3 +444,53 @@ function calcularEstadisticas(datos) {
     incidenciasExitosasPorc
   };
 }
+
+// ==== FUNCIONES DE AYUDA Y MANTENIMIENTO ====
+
+/**
+ * Limpia la hoja LOG_Dropea_Sync dejando solo el encabezado.
+ */
+function limpiarLogDeSync() {
+  const ui = SpreadsheetApp.getUi();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hoja = ss.getSheetByName('LOG_Dropea_Sync');
+
+  if (!hoja) {
+    ui.alert('ℹ️ No existe la hoja LOG_Dropea_Sync.');
+    return;
+  }
+
+  const lastRow = hoja.getLastRow();
+  if (lastRow > 1) {
+    hoja.deleteRows(2, lastRow - 1);
+  }
+
+  ui.alert('📋 LOG_Dropea_Sync limpio.');
+}
+
+/**
+ * Muestra una breve guía de uso del sistema.
+ */
+function mostrarGuiaUso() {
+  SpreadsheetApp.getUi().alert(
+    'Consulta el README del proyecto para una guía completa sobre cómo utilizar COD Manager.'
+  );
+}
+
+/**
+ * Explica el flujo básico de actualización de pedidos.
+ */
+function mostrarProcesoActualizacion() {
+  SpreadsheetApp.getUi().alert(
+    '1️⃣ Usa "Desde Dropea API" para obtener estados recientes.\n2️⃣ Revisa los cambios manuales con "Desde Worksheet".'
+  );
+}
+
+/**
+ * Indica dónde encontrar más información sobre la integración con Dropea.
+ */
+function mostrarGuiaDropea() {
+  SpreadsheetApp.getUi().alert(
+    'Asegúrate de configurar las propiedades DROPEA_API_KEY y DROPEA_API_URL.\nConsulta el README para más detalles.'
+  );
+}
