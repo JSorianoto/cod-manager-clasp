@@ -7,8 +7,8 @@ This project synchronizes orders with the Dropea API. The API key is no longer h
 1. Open the project in the Google Apps Script editor.
 2. Choose **File → Project properties** and open the **Script Properties** tab.
 3. Create the following keys and paste your values:
-   - `DROPEA_API_KEY` – Dropea API token.
-   - `DROPEA_API_URL` – optional custom endpoint. If not set, the default endpoint `https://api.dropea.com/graphql/dropshippers` is used.
+  - `DROPEA_API_KEY` – Dropea API token.
+  - `DROPEA_API_URL` – optional custom endpoint. If not set, the default endpoint `https://api.dropea.com/graphql/dropshippers` is used.
 4. Save the properties and redeploy the project if necessary.
 
 Once these properties are set, the scripts `Dropea_Update.js` and `COD_Manager_Dropea.js` will automatically read the token and endpoint from the script properties.
@@ -39,8 +39,7 @@ Adjust these values if your detection rules or provider settings differ.
 
 ## Maintenance Tools
 
-The `Limpiar LOG de sincronización` option clears the `LOG_Dropea_Sync` sheet,
-leaving only the headers. Use it periodically to keep the log small.
+The `Limpiar LOG de sincronización` option clears the `LOG_Dropea_Sync` sheet, leaving only the headers. Use it periodically to keep the log small.
 
 ## Running Tests
 
@@ -48,6 +47,3 @@ Install dependencies once using `npm install` and then run all tests with:
 
 ```bash
 npm test
-```
-
-The suite uses Jest to execute sample tests for helper utilities.

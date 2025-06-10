@@ -1,1 +1,44 @@
+# ===================================================================
+# .gitignore - Versión consolidada sin conflictos
+# ===================================================================
+
+# Google Apps Script
+.clasp.json
+appsscript.json
+
+# Node.js (para framework de pruebas agregado por Codex)
 node_modules/
+package-lock.json
+yarn.lock
+npm-debug.log*
+
+# Archivos de configuración local
+config.local.js
+.env
+.env.local
+
+# Archivos temporales y logs
+*.tmp
+*.log
+*.bak
+logs/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing (agregado por Codex)
+coverage/
+*.test.js.snapshot
+test-results/
+
+# Build y distribución
+dist/
+build/

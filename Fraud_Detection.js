@@ -198,10 +198,8 @@ function extraerInfoPedido(datosQ) {
 
 function analizarGeolocalizacion(ip, provinciaEntrega, ciudadEntrega, config) {
   try {
-    // Construir URL de consulta usando la configuración
-    const url = `${config.apis.geolocalizacion.url}${ip}?fields=${config.apis.geolocalizacion.camposConsulta}&lang=${config.apis.geolocalizacion.idioma}`;
-    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true, timeout: config.analisis.timeoutAPI });
-    const data = JSON.parse(response.getContentText());
+    // Consultar la IP utilizando cache para evitar llamadas repetidas
+    const data = consultarIPConCache(ip);
     
     if (data.status !== 'success') {
       return { puntos: config.puntuaciones.ipNoLocalizable, detalle: 'IP no localizable' };
