@@ -1,0 +1,16 @@
+{
+  "name": "cod-manager-clasp",
+  "version": "1.0.0",
+  "description": "This project synchronizes orders with the Dropea API. The API key is no longer hard-coded in the code. Instead, it is read from **Script Properties** in your Apps Script project.",
+  "main": "BotManager.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "jest": "^30.0.0"
+  }
+}

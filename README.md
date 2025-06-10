@@ -41,3 +41,13 @@ Adjust these values if your detection rules or provider settings differ.
 
 The `Limpiar LOG de sincronización` option clears the `LOG_Dropea_Sync` sheet,
 leaving only the headers. Use it periodically to keep the log small.
+
+## Running Tests
+
+Install dependencies once using `npm install` and then run all tests with:
+
+```bash
+npm test
+```
+
+The suite uses Jest to execute sample tests for helper utilities.
